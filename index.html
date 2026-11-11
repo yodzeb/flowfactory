@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <title>Flow Factory</title>
+  <meta name="description" content="A calm idle factory game about flow, queues and bottlenecks.">
+  <meta name="theme-color" content="#15181d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 22 H29" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".35"/><circle cx="8" cy="22" r="3.2" fill="var(--i-teal)"/><circle cx="15" cy="22" r="3.2" fill="var(--i-coral)"/><path d="M23 15.5 l5.2 3 v6 l-5.2 3 l-5.2 -3 v-6z" fill="var(--i-gold)"/></svg>
+      <span>Flow</span>
+    </div>
+    <div class="money">
+      <div id="cash">€0.00</div>
+      <div id="rate">€0.00 / min</div>
+    </div>
+    <nav>
+      <button data-view="factory" class="on" title="Factory">
+        <svg viewBox="0 0 24 24"><path d="M3 20V10l5 3V10l5 3V6h3l1 4h4v10z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>Factory</span>
+      </button>
+      <button data-view="map" title="Map">
+        <svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>Map</span>
+      </button>
+      <button data-view="hq" title="Headquarters">
+        <svg viewBox="0 0 24 24"><path d="M12 3l8 4v4c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V7z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg><span>HQ</span>
+      </button>
+      <button id="themeBtn" title="Switch theme">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="v-factory" class="view on">
+      <div class="stagewrap">
+        <div class="fbar" id="fbar"></div>
+        <div class="stage"><canvas id="cv"></canvas></div>
+      </div>
+      <aside id="panel" class="panel"></aside>
+    </section>
+
+    <section id="v-map" class="view">
+      <div class="mapwrap"><svg id="mapsvg" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet"></svg></div>
+      <aside id="mappanel" class="panel"></aside>
+    </section>
+
+    <section id="v-hq" class="view">
+      <div class="hq" id="hq"></div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" hidden></div>
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
