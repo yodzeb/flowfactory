@@ -9,6 +9,8 @@ import { nodeParams, globalEffects, MODERNIZE_VALUE } from './economy.js';
 
 export const SPACING = 1.6;   // min distance between items on a belt (world units); items are 1.44 wide
 export const ITEM_R = 0.72;
+const STABLE_WINDOW = 300;   // seconds averaged for the offline rate
+const STABLE_MIN = 120;      // seconds measured before the offline rate is updated
 
 export const NODE_DIM = {
   station: [7, 4.6], batch: [9, 5.4], assembly: [8, 6], dock: [5, 6],
@@ -48,8 +50,12 @@ class Edge {
   canAccept() {
     return !this.items.length || this.items[this.items.length - 1].d >= SPACING;
   }
+  // Keep the distance the previous item travelled past SPACING during the last step, so a belt
+  // reaches its real capacity (speed / SPACING) whatever the step size.
   push(item) {
-    item.d = 0;
+    const last = this.items[this.items.length - 1];
+    const over = last ? last.d - SPACING : 0;
+    item.d = over > 0 && over < SPACING ? over : 0;
     this.items.push(item);
   }
 }
@@ -114,7 +120,7 @@ export class Factory {
     const G = globalEffects(this.game.global);
     const st = this.st;
     this.p = {
-      conveyor: 5 * (1 + 0.1 * (st.conveyor || 0)) * G.logi,
+      conveyor: 5 * (1 + 0.1 * (st.conveyor || 0)) * G.logi * G.belt,
       valueMult: this.def.valueMult * Math.pow(MODERNIZE_VALUE, st.modern || 0) * G.market,
       lifeMult: G.cold,
     };
@@ -137,6 +143,22 @@ export class Factory {
       if (n.kind === 'source') n.throttle = st.throttle && st.throttle[n.id] != null ? st.throttle[n.id] : 1;
     }
     this.sinceChange = 0;
+    this.win = [];   // per-second net income since the last change (rolling, for the offline rate)
+  }
+
+  // Items/s a belt can carry at most.
+  beltCap() { return this.p.conveyor / SPACING; }
+
+  // Items waiting for node n: its own queue/bins, its input belts, and the gate stock of a
+  // supply directly feeding it. After a breakdown most of the backlog sits on the belt.
+  backlog(n) {
+    let b = n.queue ? n.queue.length : 0;
+    if (n.buf) for (const k in n.buf) b += n.buf[k].length;
+    for (const e of n.inE) {
+      b += e.items.length;
+      if (e.from.kind === 'source') b += e.from.queue.length;
+    }
+    return b;
   }
 
   // ---------- items and value ----------
@@ -272,12 +294,21 @@ export class Factory {
     if (this.secT >= 1) {
       this.secT -= 1;
       this.ema += (this.secAcc - this.ema) * (1 - Math.exp(-1 / 45));
+      // Offline rate: plain average of real income over the last 5 min (covers several truck
+      // departures), published once 2 min have been measured since the last change.
+      this.win.push(this.secAcc);
+      if (this.win.length > STABLE_WINDOW) this.win.shift();
+      if (this.win.length >= STABLE_MIN) {
+        let sum = 0;
+        for (const x of this.win) sum += x;
+        this.st.stable = Math.max(0, sum / this.win.length);
+      }
       this.secAcc = 0;
       this.sinceChange += 1;
       this.bottleneck = this.findBottleneck();
-      if (this.sinceChange > 90) this.st.stable = Math.max(0, this.ema);
       for (const n of this.nodes) {
         n.rate += (n.doneSec - n.rate) * (1 - Math.exp(-1 / 20));
+        n.rateLong = (n.rateLong || 0) + (n.doneSec - (n.rateLong || 0)) * (1 - Math.exp(-1 / 120));
         n.doneSec = 0;
       }
       if (this.fx.length) this.fx = this.fx.filter((f) => this.t - f.t0 < 2);

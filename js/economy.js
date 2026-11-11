@@ -35,7 +35,8 @@ export function nodeUpgrades(def) {
 // Global (HQ) upgrades, paid in absolute euros, apply to every factory.
 export const GLOBAL = {
   training:    { name: 'Training',     desc: '+6% processing speed everywhere', base: 2e3,  g: 3.2, max: 25 },
-  logistics:   { name: 'Logistics',    desc: '+8% belt, truck and supply speed',        base: 3e3,  g: 3.2, max: 25 },
+  logistics:   { name: 'Logistics',    desc: '+8% belt, truck and supply speed', base: 3e3,  g: 3.2, max: 25 },
+  belts:       { name: 'Belt tech',    desc: '+12% belt speed everywhere (raises belt capacity)', base: 2e4, g: 5, max: 10 },
   marketing:   { name: 'Marketing',    desc: '+10% sale value',                 base: 5e3,  g: 3.4, max: 40 },
   reliability: { name: 'Reliability',  desc: '-8% machine wear',                base: 8e3,  g: 3.3, max: 20 },
   cold:        { name: 'Cold storage', desc: '+12% shelf life',                 base: 1.2e4, g: 3.3, max: 20 },
@@ -76,6 +77,7 @@ export function globalEffects(g) {
   return {
     train: 1 + 0.06 * L('training'),
     logi: 1 + 0.08 * L('logistics'),
+    belt: 1 + 0.12 * L('belts'),
     market: 1 + 0.1 * L('marketing'),
     rel: Math.pow(0.92, L('reliability')),
     cold: 1 + 0.12 * L('cold'),

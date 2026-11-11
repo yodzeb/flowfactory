@@ -6,6 +6,7 @@ import {
   factoryCostMult, mastery, MODERNIZE_MASTERY, MODERNIZE_VALUE, OFFLINE_CAP, isLateJump,
 } from './economy.js';
 import { money, fmt, fmtTime, pct } from './util.js';
+import { SPACING } from './sim.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const KIND_NAME = { source: 'Supply', station: 'Workstation', batch: 'Batch process', assembly: 'Assembly', dock: 'Truck dock', sink: 'Market', split: 'Splitter', merge: 'Merge' };
@@ -226,7 +227,12 @@ export class UI {
       for (const n of splits) h += this.ruleRow(f, n);
     }
     h += `<h3>Factory</h3>` + this.upgRow('conv', 'conveyor', st.conveyor || 0,
-      () => `${f.p.conveyor.toFixed(1)} → ${(f.p.conveyor / (1 + 0.1 * (st.conveyor || 0)) * (1 + 0.1 * ((st.conveyor || 0) + 1))).toFixed(1)} u/s`);
+      () => {
+        const nxt = f.p.conveyor / (1 + 0.1 * (st.conveyor || 0)) * (1 + 0.1 * ((st.conveyor || 0) + 1));
+        return `belt max ${(f.beltCap() * 60).toFixed(0)} → ${(nxt / SPACING * 60).toFixed(0)} items/min`;
+      });
+    this.live['ef.conv.max'] = () => `Belts carry at most ${(f.beltCap() * 60).toFixed(0)} items/min (HQ Belt tech raises it)`;
+    h += `<div class="sub" data-live="ef.conv.max"></div>`;
     this.buys.conv = {
       cost: () => ((st.conveyor || 0) >= UPG.conveyor.max ? null : upgCost('conveyor', st.conveyor || 0, factoryCostMult(d, st))),
     };
@@ -276,7 +282,20 @@ export class UI {
     if (n.kind !== 'sink' && n.kind !== 'split' && n.kind !== 'merge') row('n.util', 'Utilization', () => pct(n.util));
     row('n.thr', 'Throughput', () => (n.rate * 60).toFixed(1) + ' / min');
     const cap = capacity(n);
-    if (cap != null) row('n.cap', 'Capacity', () => capacity(n).toFixed(1) + ' / min');
+    if (cap != null) row('n.cap', 'Capacity', () => {
+      const c = capacity(n), belt = f.beltCap() * 60;
+      const limited = n.kind !== 'source' && n.outE.length === 1 && n.outE[0].to.kind !== 'sink' && c > belt;
+      return c.toFixed(1) + ' / min' + (limited ? ` · belt max ${belt.toFixed(0)}` : '');
+    });
+    if (cap != null && n.kind !== 'source') {
+      row('n.bl', 'Backlog', () => {
+        const b = f.backlog(n);
+        const room = n.kind === 'assembly' ? Infinity : n.p.queue;
+        if (b <= room) return String(b);
+        const flow = n.rateLong || 0, c = Math.min(capacity(n), n.outE.length === 1 && n.outE[0].to.kind !== 'sink' ? f.beltCap() * 60 : Infinity) / 60;
+        return `${b} (buffer + belt) · ` + (c > flow * 1.02 && n.state !== 'broken' ? `clears in ~${fmtTime(b / (c - flow))}` : n.state === 'broken' ? 'growing' : 'not clearing');
+      });
+    }
     if (n.queue && ['station', 'batch', 'dock'].includes(n.kind)) row('n.q', 'Queue', () => `${n.queue.length} / ${n.p.queue}`);
     if (n.p.wear) row('n.wear', 'Wear', () => pct(n.wear));
     if (n.kind === 'batch') row('n.ch', 'Chamber', () => `${n.chamber.length} / ${n.p.cap} · ${n.phase}`);
@@ -296,6 +315,9 @@ export class UI {
       h += `<p class="sub" data-live="n.hint"></p>`;
       this.live['n.hint'] = () => {
         if (n.queue.length < n.p.queue * 0.5) return '';
+        const beltMax = f.beltCap() * 60;
+        if (n.p.rate * n.throttle * 60 > beltMax * 0.97)
+          return `Belt full: this supply is more than a belt can carry (${beltMax.toFixed(0)} items/min). Upgrade Conveyors or HQ Belt tech, or lower the throttle.`;
         const b = f.bottleneck;
         return 'The line cannot absorb this supply' + (b ? `: ${b.def.label} is the bottleneck.` : '.') + ' Lower the throttle or upgrade the bottleneck.';
       };
@@ -557,6 +579,6 @@ function effectText(def, key, lv, G) {
 
 function globalEffectText(key, l) {
   const e0 = globalEffects({ [key]: l }), e1 = globalEffects({ [key]: l + 1 });
-  const m = { training: 'train', logistics: 'logi', marketing: 'market', reliability: 'rel', cold: 'cold', quality: 'qual' }[key];
+  const m = { training: 'train', logistics: 'logi', belts: 'belt', marketing: 'market', reliability: 'rel', cold: 'cold', quality: 'qual' }[key];
   return `×${e0[m].toFixed(2)} → ×${e1[m].toFixed(2)}`;
 }

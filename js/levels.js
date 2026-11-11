@@ -31,7 +31,7 @@ export const LEVELS = [
     blurb: 'A simple line. The slowest station sets the pace of the whole line: find it and upgrade it. Supply you cannot absorb piles up at the gate and is then wasted.',
     items: { a: { value: 1 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 8, y: 30, type: 'a', rate: 0.4, jump: 1.7, label: 'Supply' },
+      { id: 'src', kind: 'source', x: 8, y: 30, type: 'a', rate: 0.4, jump: 1.86, label: 'Supply' },
       { id: 'cut', kind: 'station', x: 28, y: 30, time: 1.6, queue: 4, wear: 0.0015, label: 'Cut' },
       { id: 'pol', kind: 'station', x: 48, y: 30, time: 2.4, queue: 4, wear: 0.003, repair: 5, label: 'Polish' },
       { id: 'pack', kind: 'station', x: 68, y: 30, time: 1.2, queue: 4, label: 'Pack' },
@@ -44,7 +44,7 @@ export const LEVELS = [
     blurb: 'Trucks are loaded from the back: the first items take long to carry in, the last ones are quick. While the truck is away, the dock queue fills and stalls the line. Welders wear out faster when their queue is full.',
     items: { a: { value: 1.4 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 8, y: 30, type: 'a', rate: 0.42, jump: 1.68, label: 'Supply' },
+      { id: 'src', kind: 'source', x: 8, y: 30, type: 'a', rate: 0.42, jump: 2.0, label: 'Supply' },
       { id: 'form', kind: 'station', x: 26, y: 30, time: 1.5, queue: 4, label: 'Form' },
       { id: 'weld', kind: 'station', x: 44, y: 30, time: 1.8, queue: 4, wear: 0.004, repair: 5, label: 'Weld' },
       { id: 'dock', kind: 'dock', x: 64, y: 30, cap: 10, loadBase: 0.35, loadDist: 1.8, trip: 12, queue: 8, label: 'Dock' },
@@ -56,7 +56,7 @@ export const LEVELS = [
     blurb: 'Dough is perishable: it loses value while it waits and is thrown away (with a disposal fee) when too old. The oven only bakes full loads, or after a timeout. Do not overfeed.',
     items: { d: { value: 0.8, life: 30 }, k: { value: 2.2, life: 45 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 8, y: 30, type: 'd', rate: 0.8, jump: 1.26, label: 'Flour' },
+      { id: 'src', kind: 'source', x: 8, y: 30, type: 'd', rate: 0.8, jump: 1.37, label: 'Flour' },
       { id: 'mix', kind: 'station', x: 25, y: 30, time: 1.2, queue: 5, label: 'Mix' },
       { id: 'oven', kind: 'batch', x: 46, y: 30, cap: 6, time: 7, queue: 6, maxWait: 6, outType: 'k', label: 'Oven' },
       { id: 'cool', kind: 'station', x: 66, y: 30, time: 1.4, queue: 6, label: 'Cool' },
@@ -69,7 +69,7 @@ export const LEVELS = [
     blurb: 'Two mills in parallel: A is fast but fragile, B is slow but steady. Strict alternation forces both to the pace of the slowest; "least loaded" adapts. Defects are scrapped at inspection.',
     items: { a: { value: 1.5 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 6, y: 28, type: 'a', rate: 0.72, jump: 1.37, label: 'Supply' },
+      { id: 'src', kind: 'source', x: 6, y: 28, type: 'a', rate: 0.72, jump: 1.8, label: 'Supply' },
       { id: 'prep', kind: 'station', x: 19, y: 28, time: 1.0, queue: 4, label: 'Prep' },
       { id: 'sp', kind: 'split', x: 31, y: 28, label: 'Split' },
       { id: 'ma', kind: 'station', x: 46, y: 15, time: 1.4, queue: 4, wear: 0.007, defect: 0.04, repair: 8, label: 'Mill A' },
@@ -100,7 +100,7 @@ export const LEVELS = [
     blurb: 'Defective parts go to rework and back into the machine queue. A worn machine makes more defects, which add more load, which wears it more: this loop can collapse. Keep pressure low.',
     items: { a: { value: 2 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 6, y: 24, type: 'a', rate: 0.56, jump: 1.5, label: 'Supply' },
+      { id: 'src', kind: 'source', x: 6, y: 24, type: 'a', rate: 0.56, jump: 1.89, label: 'Supply' },
       { id: 'mg', kind: 'merge', x: 18, y: 24, label: 'Merge' },
       { id: 'mach', kind: 'station', x: 32, y: 24, time: 1.1, queue: 6, wear: 0.006, defect: 0.08, repair: 7, label: 'Machine' },
       { id: 'qc', kind: 'station', x: 50, y: 24, time: 0.8, queue: 5, route: 'quality', label: 'Inspect' },
@@ -115,7 +115,7 @@ export const LEVELS = [
     blurb: 'Fresh fish spoils quickly until frozen. Two batch freezers in parallel, then a truck. Slow freezers mean rotten fish; an early freeze wastes capacity.',
     items: { f: { value: 0.8, life: 40 }, z: { value: 3 } },
     nodes: [
-      { id: 'src', kind: 'source', x: 5, y: 28, type: 'f', rate: 0.8, jump: 1.36, label: 'Catch' },
+      { id: 'src', kind: 'source', x: 5, y: 28, type: 'f', rate: 0.8, jump: 1.65, label: 'Catch' },
       { id: 'clean', kind: 'station', x: 17, y: 28, time: 0.8, queue: 5, wear: 0.003, label: 'Clean' },
       { id: 'sp', kind: 'split', x: 28, y: 28, label: 'Split' },
       { id: 'fa', kind: 'batch', x: 40, y: 15, cap: 5, time: 9, queue: 5, maxWait: 7, outType: 'z', label: 'Freezer A' },
@@ -131,9 +131,9 @@ export const LEVELS = [
     blurb: 'Two products share one paint booth, then are sorted by type. If one finishing line jams, the sorter jams for both products (head-of-line blocking).',
     items: { a: { value: 2.5 }, c: { value: 3.5 } },
     nodes: [
-      { id: 'sa', kind: 'source', x: 6, y: 14, type: 'a', rate: 0.42, jump: 1.46, label: 'Circles' },
+      { id: 'sa', kind: 'source', x: 6, y: 14, type: 'a', rate: 0.42, jump: 1.71, label: 'Circles' },
       { id: 'cuta', kind: 'station', x: 19, y: 14, time: 1.3, queue: 4, label: 'Cut A' },
-      { id: 'sc', kind: 'source', x: 6, y: 42, type: 'c', rate: 0.35, jump: 1.46, label: 'Squares' },
+      { id: 'sc', kind: 'source', x: 6, y: 42, type: 'c', rate: 0.35, jump: 1.81, label: 'Squares' },
       { id: 'cutc', kind: 'station', x: 19, y: 42, time: 1.6, queue: 4, label: 'Cut C' },
       { id: 'mg', kind: 'merge', x: 31, y: 28, label: 'Merge' },
       { id: 'paint', kind: 'station', x: 43, y: 28, time: 0.9, queue: 6, wear: 0.005, defect: 0.03, repair: 8, label: 'Paint' },

@@ -1,5 +1,5 @@
 // Offline cache for the PWA. Bump VERSION when files change.
-const VERSION = 'flow-v4';
+const VERSION = 'flow-v6';
 const FILES = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './js/main.js', './js/sim.js', './js/render.js', './js/ui.js', './js/economy.js',
